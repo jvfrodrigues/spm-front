@@ -1,13 +1,37 @@
+import Button from "@/components/button";
 import Header from "@/components/header";
-import Card from "@/components/password_card";
-import { useGetPasswords } from "@/infra/api";
+import Modal from "@/components/modal";
+import PasswordForm from "@/components/password/form";
+import Card from "@/components/password/card";
+import { PasswordCreateRequest } from "@/domain/types/password";
+import { useCreatePassword, useGetPasswords } from "@/infra/api";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const Home: NextPage = () => {
   const router = useRouter();
   const { data, isLoading } = useGetPasswords();
+  const { mutateAsync: createPasswordAsync, isLoading: creationIsLoading } =
+    useCreatePassword();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleFormSubmit = async (p: PasswordCreateRequest) => {
+    createPasswordAsync(p)
+      .then(() => {
+        toast.success("Password created", {
+          duration: 1000,
+        });
+        setModalVisible(false);
+      })
+      .catch((err) => {
+        toast.error(`Error on password creation - ${err}`, {
+          duration: 1000,
+        });
+      });
+  };
 
   return (
     <>
@@ -18,7 +42,17 @@ const Home: NextPage = () => {
           content="https://nextjsconf-pics.vercel.app/og-image.png"
         />
       </Head>
-      <Header />
+      <Modal isOpen={modalVisible}>
+        <PasswordForm
+          onSubmit={handleFormSubmit}
+          onClose={() => setModalVisible(false)}
+        />
+      </Modal>
+      <Header>
+        <Button onClick={() => setModalVisible(true)}>
+          <text>Create password</text>
+        </Button>
+      </Header>
       <main className="mx-auto max-w-[1960px] p-4 bg-black">
         <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {data &&
