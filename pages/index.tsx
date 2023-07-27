@@ -7,12 +7,11 @@ import { PasswordCreateRequest } from "@/domain/types/password";
 import { useCreatePassword, useGetPasswords } from "@/infra/api";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Loading from "@/components/loading";
 
 const Home: NextPage = () => {
-  const router = useRouter();
   const { data, isLoading } = useGetPasswords();
   const { mutateAsync: createPasswordAsync, isLoading: creationIsLoading } =
     useCreatePassword();
@@ -44,6 +43,7 @@ const Home: NextPage = () => {
       </Head>
       <Modal isOpen={modalVisible}>
         <PasswordForm
+          isLoading={creationIsLoading}
           onSubmit={handleFormSubmit}
           onClose={() => setModalVisible(false)}
         />
@@ -55,7 +55,10 @@ const Home: NextPage = () => {
       </Header>
       <main className="mx-auto max-w-[1960px] p-4 bg-black">
         <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {data &&
+          {(isLoading || creationIsLoading) && <Loading />}
+          {!isLoading &&
+            !creationIsLoading &&
+            data &&
             data.map((password) => (
               <Card key={password.id} password={password} />
             ))}
