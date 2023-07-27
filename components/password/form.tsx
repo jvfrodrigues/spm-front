@@ -1,8 +1,9 @@
-import { Password } from "@/domain/types/password";
+import { Password, PasswordCreateRequest } from "@/domain/types/password";
 import { useState } from "react";
 
 interface PasswordFormProps {
   password?: Password;
+  onSubmit: (p: PasswordCreateRequest | Password) => void;
   onClose?: () => void;
 }
 
@@ -41,15 +42,24 @@ const PasswordForm = (props: PasswordFormProps) => {
       errors.username = "Username is required";
     }
 
-    if (!password.trim()) {
-      errors.password = "Password is required";
+    if (!password.trim() && password.length < 8) {
+      errors.password = "Password must be longer than 8 characters";
     }
 
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
-      // Add your form submission logic here
-      console.log({ url, name, username, password });
+      if (props.password) {
+        props.onSubmit({
+          id: props.password.id,
+          name,
+          password,
+          url,
+          username,
+        });
+      } else {
+        props.onSubmit({ name, password, url, username });
+      }
     }
   };
 
