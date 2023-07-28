@@ -1,6 +1,10 @@
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Password, PasswordCreateRequest } from "@/domain/types/password";
+import {
+  Password,
+  PasswordCreateRequest,
+  PasswordUpdateRequest,
+} from "@/domain/types/password";
 import { Config } from "@/config/config";
 
 export const api = axios.create({
@@ -15,11 +19,11 @@ function useGetPasswords() {
   );
 }
 
-export function useCreatePassword() {
+function useCreatePassword() {
   const queryClient = useQueryClient();
   return useMutation(
-    async (node: PasswordCreateRequest) =>
-      await api.post(`/password-cards`, node),
+    async (password: PasswordCreateRequest) =>
+      await api.post(`/password-cards`, password),
     {
       onSuccess: () => {
         queryClient.invalidateQueries("passwords");
@@ -28,4 +32,34 @@ export function useCreatePassword() {
   );
 }
 
-export { useGetPasswords };
+function useUpdatePassword() {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async ({ id, password }: PasswordUpdateRequest) =>
+      await api.put(`/password-cards/${id}`, password),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("passwords");
+      },
+    }
+  );
+}
+
+function useDeletePassword() {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (id: string) => await api.delete(`/password-cards/${id}`),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("passwords");
+      },
+    }
+  );
+}
+
+export {
+  useGetPasswords,
+  useCreatePassword,
+  useUpdatePassword,
+  useDeletePassword,
+};

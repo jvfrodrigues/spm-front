@@ -1,10 +1,10 @@
 import { Password, PasswordCreateRequest } from "@/domain/types/password";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "../loading";
 
 interface PasswordFormProps {
   isLoading?: boolean;
-  password?: Password;
+  passwordToEdit?: Password;
   onSubmit: (p: PasswordCreateRequest | Password) => void;
   onClose?: () => void;
 }
@@ -17,12 +17,27 @@ interface Errors {
 }
 
 const PasswordForm = (props: PasswordFormProps) => {
+  console.log(props.passwordToEdit);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({} as Errors);
+
+  useEffect(() => {
+    if (props.passwordToEdit !== undefined) {
+      setUrl(props.passwordToEdit.url);
+      setName(props.passwordToEdit.name);
+      setUsername(props.passwordToEdit.username);
+      setPassword(props.passwordToEdit.password);
+    } else {
+      setUrl("");
+      setName("");
+      setUsername("");
+      setPassword("");
+    }
+  }, [props.passwordToEdit]);
 
   const handlePasswordToggle = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -51,9 +66,9 @@ const PasswordForm = (props: PasswordFormProps) => {
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
-      if (props.password) {
+      if (props.passwordToEdit) {
         props.onSubmit({
-          id: props.password.id,
+          id: props.passwordToEdit.id,
           name,
           password,
           url,
@@ -71,7 +86,9 @@ const PasswordForm = (props: PasswordFormProps) => {
         <Loading />
       ) : (
         <>
-          <h2 className="text-xl font-semibold mb-4">Create password</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            {props.passwordToEdit ? "Edit password" : "Create password"}
+          </h2>
           <form onSubmit={handleFormSubmit}>
             <div className="mb-4">
               <label htmlFor="url" className="block text-gray-700">
@@ -162,7 +179,7 @@ const PasswordForm = (props: PasswordFormProps) => {
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
               >
-                Save
+                {props.passwordToEdit ? "Update" : "Create"}
               </button>
             </div>
           </form>

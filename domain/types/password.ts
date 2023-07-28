@@ -12,3 +12,8 @@ export interface PasswordCreateRequest {
   username: string;
   password: string;
 }
+
+export interface PasswordUpdateRequest {
+  id: string;
+  password: Password;
+}
