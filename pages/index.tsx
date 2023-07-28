@@ -35,25 +35,28 @@ const Home: NextPage = () => {
             duration: 1000,
           });
           setModalVisible(false);
+          setPasswordToEdit(undefined);
         })
         .catch((err) => {
           toast.error(`Error on password update - ${err}`, {
             duration: 1000,
           });
         });
+    } else {
+      createPasswordAsync(p)
+        .then(() => {
+          toast.success("Password created", {
+            duration: 1000,
+          });
+          setModalVisible(false);
+          setPasswordToEdit(undefined);
+        })
+        .catch((err) => {
+          toast.error(`Error on password creation - ${err}`, {
+            duration: 1000,
+          });
+        });
     }
-    createPasswordAsync(p)
-      .then(() => {
-        toast.success("Password created", {
-          duration: 1000,
-        });
-        setModalVisible(false);
-      })
-      .catch((err) => {
-        toast.error(`Error on password creation - ${err}`, {
-          duration: 1000,
-        });
-      });
   };
 
   const handleDeletePassword = async (id: string) => {
@@ -83,7 +86,7 @@ const Home: NextPage = () => {
         <PasswordForm
           key={"modal"}
           passwordToEdit={passwordToEdit}
-          isLoading={creationIsLoading}
+          isLoading={creationIsLoading || updateIsLoading}
           onSubmit={handleFormSubmit}
           onClose={() => {
             setPasswordToEdit(undefined);
@@ -93,12 +96,15 @@ const Home: NextPage = () => {
       </Modal>
       <Header>
         <Button onClick={() => setModalVisible(true)}>
-          <text>Create password</text>
+          <span>Create password</span>
         </Button>
       </Header>
       <main className="mx-auto max-w-[1960px] p-4 bg-black">
         <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {isLoading || creationIsLoading || deleteIsLoading ? (
+          {isLoading ||
+          creationIsLoading ||
+          deleteIsLoading ||
+          updateIsLoading ? (
             <Loading />
           ) : (
             data &&

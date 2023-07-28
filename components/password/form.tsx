@@ -17,7 +17,6 @@ interface Errors {
 }
 
 const PasswordForm = (props: PasswordFormProps) => {
-  console.log(props.passwordToEdit);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
